@@ -3,7 +3,7 @@ import pytest
 from brian2 import np
 
 import cleo
-from cleo.imaging import gcamp6f
+from cleo.imaging import gcamp6f_naomi
 
 
 @pytest.mark.slow
@@ -18,7 +18,7 @@ def test_geci(rand_seed):
     sgg = b2.SpikeGeneratorGroup(n_nrns, i_spk, t_spk)
     sgg._N = n_nrns  # hack for assign_coords to work
     # cleo.coords.assign_coords(sgg, c_mm[:, 0], c_mm[:, 1], c_mm[:, 2])
-    geci = gcamp6f()
+    geci = gcamp6f_naomi()
 
     sim = cleo.CLSimulator(b2.Network(sgg))
     sim.inject(geci, sgg)
@@ -33,7 +33,7 @@ def test_geci(rand_seed):
 
 def test_remove_sensor():
     ng = b2.NeuronGroup(1, "dv/dt = -v / (10*ms) : 1", threshold="v>1", reset="v=0")
-    sensor = gcamp6f()
+    sensor = gcamp6f_naomi()
     spmon = b2.SpikeMonitor(ng)
     sim = cleo.CLSimulator(b2.Network(ng, spmon))
     sim.inject(sensor, ng)

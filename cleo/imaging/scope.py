@@ -13,9 +13,8 @@ from jaxtyping import Float, UInt
 from matplotlib.artist import Artist
 from mpl_toolkits.mplot3d import Axes3D
 
-from cleo.base import Recorder
+from cleo.base import Recorder, SynapseDevice
 from cleo.coords import coords_from_ng
-from cleo.imaging.sensors import Sensor
 from cleo.utilities import (
     analog_signal,
     normalize_coords,
@@ -110,7 +109,7 @@ class Scope(Recorder):
         a noisier distribution of fluorescence, averaged over fewer pixels.
     """
 
-    sensor: Sensor = field()
+    sensor: SynapseDevice = field()
     img_width: Quantity = field()
     """The width (diameter) of the (circular) image captured by the microscope.
     Specified in distance units."""
@@ -262,6 +261,7 @@ class Scope(Recorder):
             subset_for_injct = slice(subset_start, subset_start + len(i_targets))
             signal.append(signal_per_ng[ng.name][subset_for_injct])
             n_prev_targets_for_ng[ng] = subset_start + len(i_targets)
+
         signal = np.concatenate(signal)
         noise = rng.normal(0, self.sigma_noise, len(signal))
         assert self.n == len(signal) == len(noise) == len(self.sigma_noise)
@@ -350,14 +350,10 @@ class Scope(Recorder):
         color = kwargs.pop("color", "xkcd:fluorescent green")
         snr = np.concatenate(self.sigma_per_injct)
         coords = (
-            np.concatenate(
-                [
-                    coords_from_ng(ng)[i_targets] / meter
-                    for ng, i_targets in zip(
-                        self.neuron_groups, self.i_targets_per_injct
-                    )
-                ]
-            )
+            np.concatenate([
+                coords_from_ng(ng)[i_targets] / meter
+                for ng, i_targets in zip(self.neuron_groups, self.i_targets_per_injct)
+            ])
             * meter
         )
         assert coords.shape == (len(snr), 3)

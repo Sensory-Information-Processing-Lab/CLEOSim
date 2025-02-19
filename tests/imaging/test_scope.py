@@ -6,9 +6,8 @@ import cleo
 from cleo.coords import assign_coords_rand_rect_prism, assign_xyz
 from cleo.imaging import (
     Scope,
-    Sensor,
-    # UniformGaussianNoise,
-    gcamp6f,
+    NAOMiSensor,
+    gcamp6f_naomi,
     target_neurons_in_plane,
 )
 
@@ -17,7 +16,7 @@ def test_scope():
     scope = Scope(
         focus_depth=200 * um,
         img_width=500 * um,
-        sensor=gcamp6f(),
+        sensor=gcamp6f_naomi(),
     )
     assert np.all(scope.direction == [0, 0, 1])
     assert np.all(scope.location == [0, 0, 0] * um)
@@ -129,7 +128,7 @@ def test_scope_to_neo(regular):
     scope = Scope(
         focus_depth=200 * um,
         img_width=500 * um,
-        sensor=gcamp6f(),
+        sensor=gcamp6f_naomi(),
     )
     scope.t = [1, 2, 3, 4 + regular * 0.1] * ms
     scope.dFF = [[0, 1, 2], [2, 3, 4], [4, 5, 6], [9, 8, 7]]
